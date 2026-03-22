@@ -1,0 +1,422 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AgroChat Bot Response Schema",
+  "description": "Complete JSON schema for all chatbot responses",
+  "type": "object",
+  "required": ["message_id", "timestamp", "message_type"],
+  "properties": {
+    "message_id": {
+      "type": "string",
+      "description": "Unique message identifier (UUID or timestamp-based)",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 format timestamp"
+    },
+    "message_type": {
+      "type": "string",
+      "enum": ["text", "chart", "insights", "recommendation", "alert", "composite"],
+      "description": "Type of response"
+    },
+    "text": {
+      "type": ["string", "null"],
+      "description": "Primary text content",
+      "maxLength": 5000
+    },
+    "metadata": {
+      "type": ["object", "null"],
+      "description": "Response metadata",
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Data source (ai_model, database, api, etc.)",
+          "enum": ["ai_model", "database", "weather_api", "satellite_imagery", "calculation", "error_handler", "user_input"]
+        },
+        "confidence": {
+          "type": ["number", "null"],
+          "description": "Confidence score",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "model_version": {
+          "type": ["string", "null"],
+          "description": "Model/API version"
+        },
+        "processing_time_ms": {
+          "type": ["integer", "null"],
+          "description": "Processing time in milliseconds",
+          "minimum": 0
+        },
+        "data_freshness": {
+          "type": ["string", "null"],
+          "description": "ISO 8601 duration (e.g., 'PT5M')"
+        }
+      },
+      "additionalProperties": true
+    },
+    "insights": {
+      "type": ["array", "null"],
+      "description": "Array of insight/metric cards",
+      "items": {
+        "type": "object",
+        "required": ["label", "value"],
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "Metric label",
+            "minLength": 1
+          },
+          "value": {
+            "type": "string",
+            "description": "Metric value (numeric or text representation)"
+          },
+          "unit": {
+            "type": ["string", "null"],
+            "description": "Unit of measurement",
+            "examples": ["°C", "%", "mg/kg", "pH"]
+          },
+          "trend": {
+            "type": ["string", "null"],
+            "enum": ["up", "down", "stable", null],
+            "description": "Trend direction"
+          },
+          "color": {
+            "type": ["string", "null"],
+            "enum": ["green", "red", "yellow", "blue", "orange", "purple", null],
+            "description": "Badge color"
+          },
+          "icon": {
+            "type": ["string", "null"],
+            "description": "Icon identifier (e.g., 'thermometer', 'droplet')"
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "charts": {
+      "type": ["array", "null"],
+      "description": "Array of chart visualizations (Plotly-compatible)",
+      "items": {
+        "type": "object",
+        "required": ["type", "title"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["line", "bar", "area", "scatter", "gauge", "pie", "heatmap", "box"],
+            "description": "Chart type"
+          },
+          "title": {
+            "type": "string",
+            "description": "Chart title"
+          },
+          "description": {
+            "type": ["string", "null"],
+            "description": "Chart description"
+          },
+          "data": {
+            "type": "object",
+            "required": ["x", "y"],
+            "properties": {
+              "x": {
+                "type": "array",
+                "description": "X-axis data points",
+                "items": {
+                  "oneOf": [
+                    {"type": "string"},
+                    {"type": "number"},
+                    {"type": "null"}
+                  ]
+                }
+              },
+              "y": {
+                "type": "array",
+                "description": "Y-axis data points",
+                "items": {
+                  "oneOf": [
+                    {"type": "string"},
+                    {"type": "number"},
+                    {"type": "null"}
+                  ]
+                }
+              },
+              "mode": {
+                "type": ["string", "null"],
+                "enum": ["lines", "markers", "lines+markers", null],
+                "description": "Display mode for line/scatter charts"
+              },
+              "fill": {
+                "type": ["string", "null"],
+                "enum": ["tozeroy", "tonexty", "tonext", null],
+                "description": "Fill style"
+              },
+              "name": {
+                "type": ["string", "null"],
+                "description": "Series name for legend"
+              },
+              "color": {
+                "type": ["string", "null"],
+                "description": "RGB or hex color value"
+              }
+            },
+            "additionalProperties": true
+          },
+          "layout": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": ["string", "null"]
+              },
+              "hovermode": {
+                "type": ["string", "null"],
+                "enum": ["x", "y", "x unified", "y unified", "closest", null]
+              },
+              "xaxis": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": ["string", "null"]
+                  }
+                },
+                "additionalProperties": true
+              },
+              "yaxis": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": ["string", "null"]
+                  }
+                },
+                "additionalProperties": true
+              }
+            },
+            "additionalProperties": true
+          },
+          "xaxis_label": {
+            "type": ["string", "null"],
+            "description": "X-axis label override"
+          },
+          "yaxis_label": {
+            "type": ["string", "null"],
+            "description": "Y-axis label override"
+          },
+          "time_range": {
+            "type": ["object", "null"],
+            "properties": {
+              "start": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "end": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "location": {
+      "type": ["object", "null"],
+      "description": "Geographic data for map visualization",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["map"],
+          "description": "Must be 'map'"
+        },
+        "title": {
+          "type": "string",
+          "description": "Map title"
+        },
+        "center": {
+          "type": "object",
+          "required": ["lat", "lon"],
+          "properties": {
+            "lat": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90
+            },
+            "lon": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            }
+          }
+        },
+        "zoom": {
+          "type": "integer",
+          "description": "Zoom level (1-18)",
+          "minimum": 1,
+          "maximum": 18
+        },
+        "markers": {
+          "type": ["array", "null"],
+          "items": {
+            "type": "object",
+            "required": ["lat", "lon"],
+            "properties": {
+              "lat": {
+                "type": "number",
+                "minimum": -90,
+                "maximum": 90
+              },
+              "lon": {
+                "type": "number",
+                "minimum": -180,
+                "maximum": 180
+              },
+              "label": {
+                "type": ["string", "null"]
+              },
+              "color": {
+                "type": ["string", "null"],
+                "enum": ["red", "green", "orange", "blue", "purple", null]
+              },
+              "popup": {
+                "type": ["string", "null"],
+                "description": "HTML content for popup"
+              }
+            }
+          }
+        },
+        "geojson": {
+          "type": ["object", "null"],
+          "description": "GeoJSON FeatureCollection"
+        },
+        "layer_type": {
+          "type": ["string", "null"],
+          "enum": ["satellite", "terrain", "street", null],
+          "description": "Map layer style"
+        },
+        "bounds": {
+          "type": ["object", "null"],
+          "properties": {
+            "north": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90
+            },
+            "south": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90
+            },
+            "east": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            },
+            "west": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            }
+          }
+        }
+      }
+    },
+    "recommendations": {
+      "type": ["array", "null"],
+      "description": "List of recommended actions",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 500
+      },
+      "maxItems": 10
+    },
+    "alert": {
+      "type": ["object", "null"],
+      "description": "Error/warning information",
+      "required": ["type", "title", "message"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["error", "warning", "info", "success"],
+          "description": "Alert severity"
+        },
+        "title": {
+          "type": "string",
+          "description": "Alert title"
+        },
+        "message": {
+          "type": "string",
+          "description": "Alert message"
+        },
+        "code": {
+          "type": ["string", "null"],
+          "description": "Error code (e.g., 'ERR_API_TIMEOUT')"
+        },
+        "details": {
+          "type": ["string", "null"],
+          "description": "Additional technical details"
+        },
+        "action": {
+          "type": ["string", "null"],
+          "description": "Suggested remedial action"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the alert was generated"
+        }
+      }
+    },
+    "links": {
+      "type": ["array", "null"],
+      "description": "Related resources and navigation links",
+      "items": {
+        "type": "object",
+        "required": ["text", "url"],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "Link display text"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Link URL or path"
+          },
+          "type": {
+            "type": ["string", "null"],
+            "enum": ["documentation", "related_query", "support", "external", null],
+            "description": "Link category"
+          },
+          "icon": {
+            "type": ["string", "null"],
+            "description": "Icon identifier"
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": true,
+  "examples": [
+    {
+      "message_id": "msg_001",
+      "timestamp": "2025-01-12T10:30:45Z",
+      "message_type": "text",
+      "text": "Your field looks healthy today."
+    },
+    {
+      "message_id": "msg_002",
+      "timestamp": "2025-01-12T10:31:12Z",
+      "message_type": "insights",
+      "text": "Soil health summary",
+      "insights": [
+        {
+          "label": "Soil pH",
+          "value": "7.2",
+          "unit": "pH",
+          "color": "green"
+        }
+      ]
+    }
+  ]
+}

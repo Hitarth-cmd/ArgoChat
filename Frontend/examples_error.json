@@ -1,0 +1,20 @@
+{
+  "message_id": "msg_20250112_006",
+  "timestamp": "2025-01-12T10:35:22Z",
+  "message_type": "alert",
+  "text": "Unable to fetch current weather data for your field. The system is showing cached data from 2 hours ago. The weather service should be back online shortly.",
+  "alert": {
+    "type": "error",
+    "title": "Weather API Unavailable",
+    "message": "Connection to weather service failed. The system will retry automatically in 5 minutes.",
+    "code": "ERR_API_TIMEOUT",
+    "details": "Request timed out after 30 seconds. Remote server returned status: 504 Gateway Timeout. Last successful sync: 2025-01-12T08:35:22Z",
+    "action": "Retry now or use cached data from 2 hours ago",
+    "timestamp": "2025-01-12T10:35:22Z"
+  },
+  "metadata": {
+    "source": "error_handler",
+    "confidence": null,
+    "processing_time_ms": 31000
+  }
+}
