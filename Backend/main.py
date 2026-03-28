@@ -51,7 +51,7 @@ def setup_pipeline(config: RAGConfig, force_reindex: bool = False) -> RAGPipelin
     
     # Check if collection already exists
     if vector_db.collection_exists() and not force_reindex:
-        print("\n✓ Found existing collection in Qdrant!")
+        print("\n* Found existing collection in Qdrant!")
         info = vector_db.get_collection_info()
         print(f"  - Collection: {config.vectordb.collection_name}")
         print(f"  - Vectors: {info.get('vectors_count', 'N/A')}")
@@ -67,7 +67,7 @@ def setup_pipeline(config: RAGConfig, force_reindex: bool = False) -> RAGPipelin
         master_file = Path(config.data_path) / "argo_profiles_reduced.parquet"
         data_loader = DataLoader(str(master_file), auto_transform=True)
         documents = data_loader.load_all_documents()
-        print(f"✓ Loaded {len(documents)} documents from master dataset")
+        print(f"* Loaded {len(documents)} documents from master dataset")
         
         # 2. Chunk Documents
         print("\n[2/5] Chunking documents into tokens...")
@@ -77,7 +77,7 @@ def setup_pipeline(config: RAGConfig, force_reindex: bool = False) -> RAGPipelin
             encoding_name=config.chunker.encoding_name
         )
         chunked_docs = chunker.chunk_documents(documents)
-        print(f"✓ Created {len(chunked_docs)} chunks from {len(documents)} documents")
+        print(f"* Created {len(chunked_docs)} chunks from {len(documents)} documents")
         
         # 3. Generate Embeddings
         print("\n[3/5] Generating embeddings...")
@@ -85,7 +85,7 @@ def setup_pipeline(config: RAGConfig, force_reindex: bool = False) -> RAGPipelin
             [doc['text'] for doc in chunked_docs],
             batch_size=config.embedding.batch_size
         )
-        print(f"✓ Generated embeddings with dimension: {embeddings.shape[1]}")
+        print(f"* Generated embeddings with dimension: {embeddings.shape[1]}")
         
         # 4. Create Collection and Index
         print("\n[4/5] Creating collection and indexing documents...")
@@ -104,7 +104,7 @@ def setup_pipeline(config: RAGConfig, force_reindex: bool = False) -> RAGPipelin
     )
     prompt_template = PromptTemplate()
     pipeline = RAGPipeline(retriever, llm, prompt_template)
-    print("✓ RAG Pipeline ready!")
+    print("* RAG Pipeline ready!")
     
     print("\n" + "=" * 80)
     print("READY FOR QUERIES")
@@ -212,7 +212,7 @@ def main():
     # Load configuration
     config = RAGConfig()
     
-    print(f"\n✓ Configuration loaded:")
+    print(f"\n* Configuration loaded:")
     print(f"  - Data path: {config.data_path}")
     print(f"  - LLM model: {config.llm.model_name}")
     print(f"  - Embedding model: {config.embedding.model_name}")

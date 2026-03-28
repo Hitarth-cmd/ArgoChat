@@ -126,9 +126,11 @@ def render_chat_history(history: List[Dict]) -> None:
         render_chat_message(message, is_user=is_user)
 
 
-def render_sidebar_options() -> None:
+def render_sidebar() -> None:
     """Render sidebar with options and suggestions"""
     with st.sidebar:
+        st.markdown("---")
+        
         st.markdown("### 💬 Quick Commands")
         
         quick_commands = {

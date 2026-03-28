@@ -975,7 +975,7 @@ def get_api_response(user_text: str) -> Dict[str, Any]:
         response = requests.post(
             "http://localhost:8000/chat",
             json={"message": user_text},
-            timeout=120  # generous timeout for local LLM
+            timeout=300  # increased to 300s to support heavy local model inference
         )
         if response.status_code == 200:
             return response.json()
